@@ -29,6 +29,8 @@ df.dtypes
 
 df.info()
 
+# Cleaning dataset of empty points. 
+
 df.isnull().sum()
 
 df = df.dropna(subset = "home_team")
@@ -36,12 +38,16 @@ df = df.dropna(subset = "away_score")
 df = df.dropna(subset = "home_score")
 df = df.dropna(subset = "away_team")
 
+
+# Focusing on target column for tournament as we only want our dataset's information on the FIFA World Cup.
+
 target_column = "tournament"
 
 print(df[target_column].value_counts())
 
 df = df[df["tournament"].isin(["FIFA World Cup", "FIFA World Cup qualification"])]
 
+# Creating a singular 'result' for our LogisticRegression to operate properly as it can't predict two variables at once. 
 
 def get_result(outcome):
     if outcome["home_score"] > outcome["away_score"]:
@@ -56,6 +62,8 @@ df["outcome"] = df.apply(get_result, axis=1)
 X = df[["home_team", "away_team", "tournament", "neutral"]]
 y = df["outcome"]
 
+# Using get.dummies due to the fact these columns are strings. 
+
 X = pd.get_dummies(
     X,
     columns=["home_team", "away_team", "tournament"]
@@ -64,6 +72,8 @@ X = pd.get_dummies(
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=42)
 
 print(X.head())
+
+# Splitting between training and testing for my LogisticRegression model. 
 
 model = LogisticRegression()
 
@@ -79,6 +89,8 @@ test_accuracy = accuracy_score(y_test, y_test_pred)
 print(f"Test Accuracy: {test_accuracy:.2%}")
 
 y_test_pred = model.predict(X_test)
+
+# Using classification report and confusion matrix to get a better idea of the results of my model. 
 
 print(classification_report(y_test, y_test_pred))
 
@@ -97,6 +109,9 @@ y_train_pred = model.predict(X_train)
 cm = confusion_matrix(y_train, y_train_pred)
 
 print(cm)
+
+# Using joblib so I don't have to retrain my code while attempting to create my Streamlit website. The many print features
+are just to make sure the process went correctly. 
 
 print("Before importing joblib")
 
